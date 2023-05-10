@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -192,7 +226,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#references" id="toc-references" class="nav-link active" data-scroll-target="#references">References</a></li>
+  <li><a href="#practice-problems" id="toc-practice-problems" class="nav-link active" data-scroll-target="#practice-problems"><span class="header-section-number">1.1</span> Practice problems</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -216,6 +251,234 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>Loading required packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ape)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geiger)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phytools)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="practice-problems" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="practice-problems"><span class="header-section-number">1.1</span> Practice problems</h2>
+<ol type="1">
+<li>Download the following two files for <em>Phelsuma geckos</em> from the book website: <code>phel.csv</code> and <code>phel.phy</code> (Harmon et al.&nbsp;2010). <code>phel.csv</code> is a CSV file containing trait values for ten different morphological traits. <code>phel.phy</code> is a phylogeny of thirty-three species. Read both data and tree in from file and use <code>name.check()</code> to identify any differences between the two data sets. If you find differences, prune the phylogeny and subsample the trait data to include only the species present in both the data file and the tree. Plot the tree.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pheno_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"http://www.phytools.org/Rbook/1/phel.csv"</span>, <span class="at">row.names =</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>tree <span class="ot">&lt;-</span> <span class="fu">read.tree</span>(<span class="st">"http://www.phytools.org/Rbook/1/phel.phy"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Taking a look at the data</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(pheno_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 svl      jaw    noseye     eyed   eyeeye        hw       hn
+abbotti     53.66667 14.43333  6.666667 3.033333 4.166667 10.033333 22.10000
+astriata    51.38462 13.20000  6.381818 2.500000 4.045455  8.691667 20.95833
+borbonica   66.20000 16.43000  7.960000 2.800000 4.840000 12.060000 25.43000
+cepedianaA  51.80000 13.22667  6.226667 2.406667 4.166667  9.433333 21.49333
+dubia       53.06250 13.21333  6.300000 2.075000 4.418750  8.950000 21.56875
+guentheri  117.00000 28.70000 14.450000 5.100000 8.950000 22.500000 45.35000
+                jaww       uhl       lhl
+abbotti     9.050000  9.433333  6.766667
+astriata    7.180000  8.250000  5.983333
+borbonica  10.633333 10.942857  7.612500
+cepedianaA  8.008333  8.180000  5.654545
+dubia       7.690000  8.366667  5.753333
+guentheri  17.400000 16.600000 11.100000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tree</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Phylogenetic tree with 33 tips and 32 internal nodes.
+
+Tip labels:
+  comoraegrandensis, vnigra, anjouanensis, robertmertensi, pasteuri, laticauda, ...
+
+Rooted; includes branch lengths.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking for differences between the data sets</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> <span class="fu">name.check</span>(tree, pheno_data)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>check</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$tree_not_data
+ [1] "andamanense"       "anjouanensis"      "cepedianaB"       
+ [4] "comoraegrandensis" "edwardnewtoni"     "gigas"            
+ [7] "inexpectata"       "kochi"             "leiogaster"       
+[10] "parkeri"           "pasteuri"          "rosagularis"      
+[13] "serraticauda"      "vnigra"           
+
+$data_not_tree
+[1] "cepedianaA"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pruning the tree to match data</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>final_tree <span class="ot">&lt;-</span> <span class="fu">drop.tip</span>(tree, check<span class="sc">$</span>tree_not_data)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>final_tree</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Phylogenetic tree with 19 tips and 18 internal nodes.
+
+Tip labels:
+  robertmertensi, laticauda, lineata, comorensis, quadriocellata, dubia, ...
+
+Rooted; includes branch lengths.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep in the data frame only taxa that are in the tree</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>final_pheno <span class="ot">&lt;-</span> pheno_data[final_tree<span class="sc">$</span>tip.label, ]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(final_pheno)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    svl      jaw noseye     eyed   eyeeye       hw       hn
+robertmertensi 47.60000 12.30000 5.9625 2.350000 3.710000 8.480000 20.00000
+laticauda      50.93750 13.12500 6.1250 2.226667 4.375000 9.156250 20.56875
+lineata        46.02000 12.22800 5.6000 2.157447 4.058000 8.665957 19.45800
+comorensis     47.14286 12.37143 5.8000 2.100000 3.933333 8.714286 19.81429
+quadriocellata 53.00000 13.75000 6.0000 2.200000 4.450000 9.900000 21.15000
+dubia          53.06250 13.21333 6.3000 2.075000 4.418750 8.950000 21.56875
+                   jaww      uhl      lhl
+robertmertensi 7.350000 7.575000 5.250000
+laticauda      7.969231 8.316667 5.891667
+lineata        7.241304 7.202703 5.182051
+comorensis     7.114286 7.314286 5.380000
+quadriocellata 8.350000 8.250000 5.900000
+dubia          7.690000 8.366667 5.753333</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the tree</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(final_tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/p1-1.png" class="img-fluid" width="576"></p>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Use <code>phyl.pca()</code> to run a phylogenetic principal component analysis (PCA) of the morphological data set and tree from practice problem 1. When data for different variables in a PCA have different orders of magnitude, it often makes sense to transform by the natural logarithm and conduct our analysis on the log-transformed values instead of on the original traits. Inspect your data to see if this applies and then decide whether or not to log-transform before undertaking your phylogenetic PCA. After you’ve obtained a result for the PCA, create a screeplot to visualize the distribution of variation between the different principal component axes.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform phylogenetic PCA</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">phyl.pca</span>(final_tree, final_pheno)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>pca</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Phylogenetic pca
+Standard deviations:
+        PC1         PC2         PC3         PC4         PC5         PC6 
+0.843018016 0.031026258 0.025212345 0.021589766 0.016268797 0.013849981 
+        PC7         PC8         PC9        PC10 
+0.007047147 0.005435102 0.004776059 0.003284026 
+Loads:
+             PC1         PC2          PC3          PC4           PC5
+svl    0.9999053 -0.01000824  0.006871026 -0.003374178 -0.0002305335
+jaw    0.9961933  0.04141104  0.040942394 -0.030008137  0.0197234893
+noseye 0.9961428 -0.02767322  0.040672296 -0.019964183 -0.0483030086
+eyed   0.9219025  0.06912433  0.000145796 -0.140928915 -0.2706281183
+eyeeye 0.9664016  0.12525023 -0.060244831  0.014826908  0.2041541534
+hw     0.9905783  0.07880385 -0.057263869 -0.087077681  0.0166403194
+hn     0.9961222  0.07041295 -0.015318076  0.048329317 -0.0140345807
+jaww   0.9808645 -0.04636245 -0.184855183 -0.022132188 -0.0220226136
+uhl    0.9867331 -0.13722798 -0.049202943  0.041799930  0.0236962841
+lhl    0.9772051 -0.11752704 -0.009169470  0.121780363  0.0546134754
+                PC6           PC7           PC8           PC9          PC10
+svl    -0.005382531 -0.0008324387 -0.0007677909  0.0004646226  0.0004164433
+jaw     0.047441908  0.0248727578 -0.0058814817  0.0031244424 -0.0021247618
+noseye  0.015724732 -0.0006341286  0.0430018976  0.0023434645 -0.0211047680
+eyed    0.190365638 -0.0379885680  0.0621004043  0.0581208337  0.0854421226
+eyeeye -0.044275914  0.0044588748  0.0467763913  0.0234067434  0.0116596316
+hw      0.023674650 -0.0256000605 -0.0016469256 -0.0134127827 -0.0027369653
+hn      0.002434144  0.0011243296  0.0005459473 -0.0027775843 -0.0002157374
+jaww   -0.002093613  0.0190151420 -0.0042700446  0.0142197382 -0.0047639416
+uhl     0.039274297  0.0139984260  0.0132246100 -0.0286562314  0.0078761587
+lhl     0.101021863 -0.0486908262 -0.0123355346  0.0234627715 -0.0090268595</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a screeplot with variance explained by each PC</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p_screeplot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Variance =</span> <span class="fu">signif</span>(<span class="fu">as.princomp</span>(pca)<span class="sc">$</span>sdev <span class="sc">^</span> <span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">PC =</span> <span class="fu">factor</span>(<span class="fu">paste0</span>(<span class="st">"PC"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), <span class="at">levels =</span> <span class="fu">paste0</span>(<span class="st">"PC"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> PC, <span class="at">y =</span> Variance <span class="sc">*</span> <span class="dv">100</span>)) <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"dodgerblue4"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> Variance), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">100</span>) <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Screeplot for phylogenetic PCA of Phelsuma sp. morphological traits"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Variance explained (%)"</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>p_screeplot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/p2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Use <code>phylomorphospace()</code> to create a single projection of the phylogeny into morphospace for the first two PC axes from practice problem 1.2. Can you think of a way to project the tree into a space defined by more than two principal component dimensions? Hint: look up the help pages for <code>phylomorphospace3d()</code> and <code>phyloScattergram()</code> for ideas, or consider simply subdividing your plotting device using <code>par(mfrow)</code>.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create phylomorphospace plot for different pairwise combinations of PCs</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>combs <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>p_pms <span class="ot">&lt;-</span> <span class="fu">lapply</span>(combs, <span class="cf">function</span>(x) {</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Get phylomorphospace coordinates</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    score_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">scores</span>(pca)[, x])</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    cols <span class="ot">&lt;-</span> <span class="fu">names</span>(score_df)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    pms <span class="ot">&lt;-</span> <span class="fu">phylomorphospace</span>(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>        final_tree, score_df</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    coord <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">xstart =</span> pms<span class="sc">$</span>xx[pms<span class="sc">$</span>edge[, <span class="dv">1</span>]],</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">ystart =</span> pms<span class="sc">$</span>yy[pms<span class="sc">$</span>edge[, <span class="dv">1</span>]],</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">xstop =</span> pms<span class="sc">$</span>xx[pms<span class="sc">$</span>edge[, <span class="dv">2</span>]],</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">ystop =</span> pms<span class="sc">$</span>yy[pms<span class="sc">$</span>edge[, <span class="dv">2</span>]],</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">nodestart =</span> pms<span class="sc">$</span>edge[, <span class="dv">1</span>],</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">nodestop =</span> pms<span class="sc">$</span>edge[, <span class="dv">2</span>]</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    p_phylomorphospace <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_point</span>(</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> score_df, </span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> .data[[cols[<span class="dv">1</span>]]], <span class="at">y =</span> .data[[cols[<span class="dv">2</span>]]]), </span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"darkblue"</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_segment</span>(</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> coord, <span class="fu">aes</span>(<span class="at">x =</span> xstart, <span class="at">y =</span> ystart, <span class="at">xend =</span> xstop, <span class="at">yend =</span> ystop), </span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">0.5</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">x =</span> cols[<span class="dv">1</span>], <span class="at">y =</span> cols[<span class="dv">2</span>])</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(p_phylomorphospace)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/unnamed-chunk-1-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Arrange plots in a panel</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(p_pms) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_annotation</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Phylomorphospace of different pairwise combinations of PCs"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_01_files/figure-html/unnamed-chunk-1-5.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 <section id="references" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
 
