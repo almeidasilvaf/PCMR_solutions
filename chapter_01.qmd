@@ -1,5 +1,149 @@
 
 # A brief introduction to phylogenetics in R
 
+Loading required packages:
+
+```{r load-pkgs}
+#| message: false
+#| warning: false
+
+# Load required packages
+library(ape)
+library(geiger)
+library(phytools)
+library(ggplot2)
+library(patchwork)
+```
+
+## Practice problems
+
+1. Download the following two files for *Phelsuma geckos* from the book
+website: `phel.csv` and `phel.phy` (Harmon et al. 2010). 
+`phel.csv` is a CSV file containing trait values for ten different 
+morphological traits. `phel.phy` is a phylogeny of thirty-three species. 
+Read both data and tree in from file and use `name.check()` to identify 
+any differences between the two data sets. If you find differences, prune the
+phylogeny and subsample the trait data to include only the species present in 
+both the data file and the tree. Plot the tree.
+
+```{r p1, fig.height=6, fig.width=6}
+#| fig-height: 6
+#| fig-width: 6
+
+# Get data
+pheno_data <- read.csv(
+    "http://www.phytools.org/Rbook/1/phel.csv", row.names = 1
+)
+tree <- read.tree("http://www.phytools.org/Rbook/1/phel.phy")
+
+# Taking a look at the data
+head(pheno_data)
+tree
+
+# Checking for differences between the data sets
+check <- name.check(tree, pheno_data)
+check
+
+# Pruning the tree to match data
+final_tree <- drop.tip(tree, check$tree_not_data)
+final_tree
+
+# Keep in the data frame only taxa that are in the tree
+final_pheno <- pheno_data[final_tree$tip.label, ]
+head(final_pheno)
+
+# Plot the tree
+plot(final_tree)
+```
+
+2. Use `phyl.pca()` to run a phylogenetic principal component analysis (PCA) 
+of the morphological data set and tree from practice problem 1. When data for
+different variables in a PCA have different orders of magnitude, 
+it often makes sense to transform by the natural logarithm and 
+conduct our analysis on the log-transformed values instead of on the original 
+traits. Inspect your data to see if this applies and then decide whether or 
+not to log-transform before undertaking your phylogenetic PCA. After you’ve 
+obtained a result for the PCA, create a screeplot to visualize the 
+distribution of variation between the different principal component axes.
+
+```{r p2}
+# Perform phylogenetic PCA
+pca <- phyl.pca(final_tree, final_pheno)
+pca
+
+# Create a screeplot with variance explained by each PC
+p_screeplot <- data.frame(
+    Variance = signif(as.princomp(pca)$sdev ^ 2, 2),
+    PC = factor(paste0("PC", 1:10), levels = paste0("PC", 1:10))
+) |>
+    ggplot(aes(x = PC, y = Variance * 100)) +
+    geom_col(fill = "dodgerblue4", color = "black") +
+    geom_text(aes(label = Variance), vjust = -0.3) +
+    ylim(0, 100) +
+    labs(
+        title = "Screeplot for phylogenetic PCA of Phelsuma sp. morphological traits",
+        x = "", y = "Variance explained (%)"
+    ) +
+    theme_bw()
+
+p_screeplot
+```
+
+3. Use `phylomorphospace()` to create a single projection of the phylogeny 
+into morphospace for the first two PC axes from practice problem 1.2. Can you 
+think of a way to project the tree into a space defined by more than two 
+principal component dimensions? Hint: look up the help pages for 
+`phylomorphospace3d()` and `phyloScattergram()` for ideas, or consider 
+simply subdividing your plotting device using `par(mfrow)`.
+
+```{r}
+# Create phylomorphospace plot for different pairwise combinations of PCs
+combs <- list(
+    c(1, 2),
+    c(1, 3),
+    c(2, 3),
+    c(1, 4)
+)
+
+p_pms <- lapply(combs, function(x) {
+    ## Get phylomorphospace coordinates
+    score_df <- as.data.frame(scores(pca)[, x])
+    cols <- names(score_df)
+    
+    pms <- phylomorphospace(
+        final_tree, score_df
+    )
+    coord <- data.frame(
+        xstart = pms$xx[pms$edge[, 1]],
+        ystart = pms$yy[pms$edge[, 1]],
+        xstop = pms$xx[pms$edge[, 2]],
+        ystop = pms$yy[pms$edge[, 2]],
+        nodestart = pms$edge[, 1],
+        nodestop = pms$edge[, 2]
+    )
+    
+    p_phylomorphospace <- ggplot() +
+        geom_point(
+            data = score_df, 
+            aes(x = .data[[cols[1]]], y = .data[[cols[2]]]), 
+            size = 3, color = "darkblue"
+        ) +
+        geom_segment(
+            data = coord, aes(x = xstart, y = ystart, xend = xstop, yend = ystop), 
+            size = 0.5
+        ) +
+        theme_classic() +
+        labs(x = cols[1], y = cols[2])
+    
+    return(p_phylomorphospace)
+})
+
+# Arrange plots in a panel
+wrap_plots(p_pms) +
+    plot_annotation(
+        title = "Phylomorphospace of different pairwise combinations of PCs"
+    )
+```
+
 
 ## References {.unnumbered}

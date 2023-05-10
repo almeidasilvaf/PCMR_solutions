@@ -21,7 +21,10 @@ packages <- c(
     "treeio", 
     "ggtree", 
     "here", 
-    "phangorn"
+    "phangorn",
+    "geiger",
+    "ggplot2",
+    "patchwork"
 )
 
 BiocManager::install(packages)
