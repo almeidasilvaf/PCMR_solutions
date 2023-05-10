@@ -1,0 +1,30 @@
+# Preface {.unnumbered}
+
+This book contains solutions to the exercises in the book 
+__Phylogenetic Comparative Methods in R__ [@revell2022phylogenetic].
+
+## Setup
+
+To run the code in this book, you will need to install R (\>=4.2.0)
+and the following packages:
+
+```{r}
+#| eval: false
+
+# Install BiocManager
+install.packages("BiocManager")
+
+# Use BiocManager to install required packages
+packages <- c(
+    "ape",
+    "phytools",
+    "treeio", 
+    "ggtree", 
+    "here", 
+    "phangorn"
+)
+
+BiocManager::install(packages)
+```
+
+After that, you should have everything ready.

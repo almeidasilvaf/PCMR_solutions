@@ -1,0 +1,17 @@
+project:
+  type: book
+
+book:
+  title: "Phylogenetic Comparative Methods in R - Solutions"
+  date: "2023"
+  chapters:
+    - index.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+
+editor: 
+  mode: source
