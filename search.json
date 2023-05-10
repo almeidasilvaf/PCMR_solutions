@@ -4,6 +4,111 @@
     "href": "index.html",
     "title": "Phylogenetic Comparative Methods in R - Solutions",
     "section": "",
-    "text": "This book contains solutions to the exercises in the book Phylogenetic Comparative Methods in R (Revell and Harmon 2022).\n\n\nTo run the code in this book, you will need to install R (>=4.2.0) and the following packages:\n\n# Install BiocManager\ninstall.packages(\"BiocManager\")\n\n# Use BiocManager to install required packages\npackages <- c(\n    \"ape\",\n    \"phytools\",\n    \"treeio\", \n    \"ggtree\", \n    \"here\", \n    \"phangorn\"\n)\n\nBiocManager::install(packages)\n\nAfter that, you should have everything ready.\n\n\n\n\nRevell, Liam J, and Luke J Harmon. 2022. Phylogenetic Comparative Methods in r. Princeton University Press."
+    "text": "Preface\nThis book contains solutions to the exercises in the book Phylogenetic Comparative Methods in R (Revell and Harmon 2022)."
+  },
+  {
+    "objectID": "index.html#setup",
+    "href": "index.html#setup",
+    "title": "Phylogenetic Comparative Methods in R - Solutions",
+    "section": "Setup",
+    "text": "Setup\nTo run the code in this book, you will need to install R (&gt;=4.2.0) and the following packages:\n\n# Install BiocManager\ninstall.packages(\"BiocManager\")\n\n# Use BiocManager to install required packages\npackages &lt;- c(\n    \"ape\",\n    \"phytools\",\n    \"treeio\", \n    \"ggtree\", \n    \"here\", \n    \"phangorn\"\n)\n\nBiocManager::install(packages)\n\nAfter that, you should have everything ready."
+  },
+  {
+    "objectID": "index.html#references",
+    "href": "index.html#references",
+    "title": "Phylogenetic Comparative Methods in R - Solutions",
+    "section": "References",
+    "text": "References\n\n\n\n\nRevell, Liam J, and Luke J Harmon. 2022. Phylogenetic Comparative Methods in r. Princeton University Press."
+  },
+  {
+    "objectID": "chapter_01.html#references",
+    "href": "chapter_01.html#references",
+    "title": "1  A brief introduction to phylogenetics in R",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_02.html#references",
+    "href": "chapter_02.html#references",
+    "title": "2  Phylogenetically independent contrasts",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_03.html#references",
+    "href": "chapter_03.html#references",
+    "title": "3  Phylogenetic generalized least squares",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_04.html#references",
+    "href": "chapter_04.html#references",
+    "title": "4  Modeling continuous character evolution on a phylogeny",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_05.html#references",
+    "href": "chapter_05.html#references",
+    "title": "5  Multi-rate, multi-regime, and multivariate models for continuous traits",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_06.html#references",
+    "href": "chapter_06.html#references",
+    "title": "6  Modeling discrete character evolution on a phylogeny",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_07.html#references",
+    "href": "chapter_07.html#references",
+    "title": "7  Other models of discrete character evolution",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_08.html#references",
+    "href": "chapter_08.html#references",
+    "title": "8  Reconstructing ancestral states",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_09.html#references",
+    "href": "chapter_09.html#references",
+    "title": "9  Analysis of diversification with phylogenies",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_10.html#references",
+    "href": "chapter_10.html#references",
+    "title": "10  Time- and density-dependent diversification",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_11.html#references",
+    "href": "chapter_11.html#references",
+    "title": "11  Character-dependent diversification",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_12.html#references",
+    "href": "chapter_12.html#references",
+    "title": "12  Biogeography and phylogenetic community ecology",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "chapter_13.html#references",
+    "href": "chapter_13.html#references",
+    "title": "13  Plotting phylogenies and comparative data",
+    "section": "References",
+    "text": "References"
   }
 ]
