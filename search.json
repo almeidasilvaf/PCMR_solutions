@@ -1,0 +1,9 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Phylogenetic Comparative Methods in R - Solutions",
+    "section": "",
+    "text": "This book contains solutions to the exercises in the book Phylogenetic Comparative Methods in R (Revell and Harmon 2022).\n\n\nTo run the code in this book, you will need to install R (>=4.2.0) and the following packages:\n\n# Install BiocManager\ninstall.packages(\"BiocManager\")\n\n# Use BiocManager to install required packages\npackages <- c(\n    \"ape\",\n    \"phytools\",\n    \"treeio\", \n    \"ggtree\", \n    \"here\", \n    \"phangorn\"\n)\n\nBiocManager::install(packages)\n\nAfter that, you should have everything ready.\n\n\n\n\nRevell, Liam J, and Luke J Harmon. 2022. Phylogenetic Comparative Methods in r. Princeton University Press."
+  }
+]
