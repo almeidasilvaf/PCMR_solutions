@@ -6,6 +6,19 @@ book:
   date: "2023"
   chapters:
     - index.qmd
+    - chapter_01.qmd
+    - chapter_02.qmd
+    - chapter_03.qmd
+    - chapter_04.qmd
+    - chapter_05.qmd
+    - chapter_06.qmd
+    - chapter_07.qmd
+    - chapter_08.qmd
+    - chapter_09.qmd
+    - chapter_10.qmd
+    - chapter_11.qmd
+    - chapter_12.qmd
+    - chapter_13.qmd
 
 bibliography: references.bib
 
