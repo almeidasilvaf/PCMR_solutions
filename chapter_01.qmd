@@ -110,9 +110,7 @@ p_pms <- lapply(combs, function(x) {
     score_df <- as.data.frame(scores(pca)[, x])
     cols <- names(score_df)
     
-    pms <- phylomorphospace(
-        final_tree, score_df
-    )
+    pms <- phylomorphospace(final_tree, score_df)
     coord <- data.frame(
         xstart = pms$xx[pms$edge[, 1]],
         ystart = pms$yy[pms$edge[, 1]],
@@ -130,7 +128,7 @@ p_pms <- lapply(combs, function(x) {
         ) +
         geom_segment(
             data = coord, aes(x = xstart, y = ystart, xend = xstop, yend = ystop), 
-            size = 0.5
+            linewidth = 0.5
         ) +
         theme_classic() +
         labs(x = cols[1], y = cols[2])
