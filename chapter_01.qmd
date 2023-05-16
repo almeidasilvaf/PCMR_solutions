@@ -18,7 +18,7 @@ library(patchwork)
 ## Practice problems
 
 1. Download the following two files for *Phelsuma geckos* from the book
-website: `phel.csv` and `phel.phy` (Harmon et al. 2010). 
+website: `phel.csv` and `phel.phy` [@harmon2010early]. 
 `phel.csv` is a CSV file containing trait values for ten different 
 morphological traits. `phel.phy` is a phylogeny of thirty-three species. 
 Read both data and tree in from file and use `name.check()` to identify 

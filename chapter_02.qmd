@@ -1,5 +1,218 @@
 
 # Phylogenetically independent contrasts
 
+Loading required packages:
+
+```{r load-pkgs}
+#| message: false
+#| warning: false
+
+set.seed(123) # for reproducibility
+
+library(phytools)
+library(ape)
+library(ggplot2)
+library(patchwork)
+```
+
+## Practice problems
+
+1. Repeat your PIC analysis comparing body mass and home range but for 
+only one clade in your tree: the artiodactyls. Use `extract.clade()` 
+to pull out this taxon from your tree of mammals. Do the results 
+and conclusions of your analysis change? If so, in what way?
+
+```{r fig.height=9, fig.width=8}
+#| fig-width: 8
+#| fig-height: 9
+
+# Loading data
+mammalHR <- read.csv(
+    "http://www.phytools.org/Rbook/2/mammalHR.csv", row.names = 1
+)
+mammal_tree <- read.tree("http://www.phytools.org/Rbook/2/mammalHR.phy")
+
+# Visualize the tree to see the node number for Artiodactyla
+plotTree(mammal_tree, ftype = "i")
+nodelabels(bg = "white", cex = 0.5, frame = "circle")
+
+# Extract Artiodactyla (node 75)
+artio_tree <- extract.clade(mammal_tree, node = 75)
+artio_tree
+
+# Subset the phenotypic data to include only Artiodactyla species
+artio <- mammalHR[artio_tree$tip.label, ]
+head(artio)
+
+# Get home range and bodty mass as named vectors
+home_range <- setNames(artio$homeRange, rownames(artio))
+home_range
+
+body_mass <- setNames(artio$bodyMass, rownames(artio))
+body_mass
+```
+
+```{r}
+# Compute PICs for home range and body mass
+pic_homerange <- pic(log(home_range), artio_tree)
+pic_bodymass <- pic(log(body_mass), artio_tree)
+
+pic_homerange
+pic_bodymass
+
+
+# Fit linear model to PICs without intercept
+pic_model <- lm(pic_homerange ~ pic_bodymass + 0)
+summary(pic_model)
+
+# Visualizing the model
+p_pics <- data.frame(
+    Home_range = pic_homerange, 
+    Body_mass = pic_bodymass
+) |>
+    ggplot(aes(x = Body_mass, y = Home_range)) +
+    geom_point(size = 3, color = "deepskyblue4") +
+    geom_vline(xintercept = 0, linetype = 3) +
+    geom_hline(yintercept = 0, linetype = 3) +
+    geom_smooth(method = "lm", se = FALSE, formula = "y ~ x") +
+    labs(
+        title = "Regression of home range on body size for Artiodactyla",
+        subtitle = "Regression was performed on phylogenetically independent contrasts (PICs)",
+        x = "PICs for log(body mass)",
+        y = "PICs for log(range size)",
+    ) +
+    theme_classic()
+
+p_pics
+```
+
+Results and conclusions did not change.
+
+
+2. On the book website, we supply some data for a group of Asian barbets (`BarbetTree.nex` and `Barbetdata_mod.csv`): members of the bird family 
+Megalaimidae [@gonzalez2013evolution]. Using these data and the method of
+phylogenetic independent contrasts, test for a relationship between 
+the two variables *Lnalt* and *wing*. 
+What do you find? How does the slope of your relationship change 
+if you fit *Lnalt wing* versus *wing Lnalt*? 
+How does the P-value of a statistical test of this relationship change?
+
+```{r fig.width=8, fig.height=5}
+# Get data
+barbet <- read.csv(
+    "http://www.phytools.org/Rbook/2/Barbetdata.csv", 
+    row.names = 1
+)
+barbet_tree <- read.nexus("http://www.phytools.org/Rbook/2/BarbetTree.nex")
+
+# Take a look at the data
+head(barbet)
+barbet_tree
+
+# Check tree and data for inconsistencies
+check <- geiger::name.check(barbet_tree, barbet)
+check
+
+barbet_tree <- drop.tip(barbet_tree, check$tree_not_data)
+
+# Define function to fit regression on PICs for variables x and y
+fit_pics <- function(tree, data, x, y) {
+    
+    # Get variables as named vectors
+    var_x <- log(setNames(data[[x]], rownames(data)))
+    var_y <- log(setNames(data[[y]], rownames(data)))
+
+    # Compute PICs
+    pic_x <- pic(var_x, tree)
+    pic_y <- pic(var_y, tree)
+    
+    # Fit linear model to PICs without intercept
+    pic_model <- summary(lm(pic_y ~ pic_x + 0))
+    
+    # Get estimates
+    r2 <- signif(pic_model$r.squared, 1)
+    slope <- signif(pic_model$coefficients[1], 2)
+    p <- format(pic_model$coefficients[4], scientific = TRUE)
+    
+    subtitle <- bquote(beta[1] == .(slope) * ", " ~ R^2 == .(r2) * ", " ~ P == .(p))
+
+    # Visualizing the model
+    p_pics <- data.frame(
+        X = pic_x, 
+        Y = pic_y
+    ) |>
+        ggplot(aes(x = X, y = Y)) +
+        geom_point(size = 3, color = "deepskyblue4") +
+        geom_vline(xintercept = 0, linetype = 3) +
+        geom_hline(yintercept = 0, linetype = 3) +
+        geom_smooth(method = "lm", se = FALSE, formula = "y ~ x") +
+        labs(
+            title = paste0("Regression of ", y, " on ", x),
+            subtitle = subtitle,
+            x = paste0("PICs for log(", x, ")"),
+            y = paste0("PICs for log(", y, ")")
+        ) +
+        theme_classic()
+    
+    p_pics
+    return(p_pics)
+}
+
+# Fit a regression of `wing` on `Lnalt` using PICs
+model1 <- fit_pics(barbet_tree, barbet, "Lnalt", "wing")
+
+# Fit a regression of `Lnalt` on `wing` using PICs
+model2 <- fit_pics(barbet_tree, barbet, "wing", "Lnalt")
+
+# Visualize plots together
+wrap_plots(
+    model1, model2, ncol = 2
+)
+```
+
+In both models (regressing `wing` on `Lnalt` and regressing `Lnalt` on
+`wing`), there is no significant association association between
+the variables. The P-value and variance explained remain the same,
+but the slope ($B_1$) changes, which is expected considering that predictors
+and outcomes have been flipped.
+
+
+3. If you multiply all the branches of your phylogenetic tree by 100, 
+will your independent contrasts analysis change? Why or why not? 
+Can you confirm this using R code? Don’t forget to use what you learned
+about the internal structure of a "phylo" object in chapter 1 to 
+modify your tree.
+
+```{r}
+# Multiple all branches by 100
+new_barbet_tree <- barbet_tree
+new_barbet_tree$edge.length <- new_barbet_tree$edge.length * 100
+
+# Compute PICs for `wing` using original and modified tree
+original_pic_wing <- pic(
+    log(setNames(barbet$wing, rownames(barbet))), barbet_tree
+)
+modified_pic_wing <- pic(
+    log(setNames(barbet$wing, rownames(barbet))), new_barbet_tree
+)
+
+# Are PICs the same?
+identical(original_pic_wing, modified_pic_wing)
+head(original_pic_wing)
+head(modified_pic_wing)
+
+# Perform regression of `wing` on `Lnalt` using both trees
+original_model <- fit_pics(barbet_tree, barbet, "Lnalt", "wing")
+modified_model <- fit_pics(new_barbet_tree, barbet, "Lnalt", "wing")
+
+# Compare models
+wrap_plots(original_model, modified_model)
+```
+
+The PICs change (PICs using the modified tree are the PICs of the original
+tree divided by 10), but the results of the regression using PICs do not 
+change, because the relationship between the species (i.e., the tree topology)
+remained the same after multiplying branch lengths by 100.
+
 
 ## References {.unnumbered}
