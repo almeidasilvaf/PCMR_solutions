@@ -430,6 +430,7 @@ F-statistic: 44.26 on 1 and 22 DF,  p-value: 1.091e-06</code></pre>
 </div>
 </div>
 <p>Results and conclusions did not change.</p>
+<hr>
 <ol start="2" type="1">
 <li>On the book website, we supply some data for a group of Asian barbets (<code>BarbetTree.nex</code> and <code>Barbetdata_mod.csv</code>): members of the bird family Megalaimidae <span class="citation" data-cites="gonzalez2013evolution">(<a href="#ref-gonzalez2013evolution" role="doc-biblioref">Gonzalez-Voyer et al. 2013</a>)</span>. Using these data and the method of phylogenetic independent contrasts, test for a relationship between the two variables <em>Lnalt</em> and <em>wing</em>. What do you find? How does the slope of your relationship change if you fit <em>Lnalt wing</em> versus <em>wing Lnalt</em>? How does the P-value of a statistical test of this relationship change?</li>
 </ol>
@@ -515,7 +516,7 @@ character(0)</code></pre>
 <span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"deepskyblue4"</span>) <span class="sc">+</span></span>
 <span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
 <span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> <span class="st">"y ~ x"</span>) <span class="sc">+</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">formula =</span> <span class="st">"y ~ x+0"</span>) <span class="sc">+</span></span>
 <span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(</span>
 <span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>            <span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">"Regression of "</span>, y, <span class="st">" on "</span>, x),</span>
 <span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">subtitle =</span> subtitle,</span>
@@ -543,6 +544,7 @@ character(0)</code></pre>
 </div>
 </div>
 <p>In both models (regressing <code>wing</code> on <code>Lnalt</code> and regressing <code>Lnalt</code> on <code>wing</code>), there is no significant association association between the variables. The P-value and variance explained remain the same, but the slope (<span class="math inline">\(B_1\)</span>) changes, which is expected considering that predictors and outcomes have been flipped.</p>
+<hr>
 <ol start="3" type="1">
 <li>If you multiply all the branches of your phylogenetic tree by 100, will your independent contrasts analysis change? Why or why not? Can you confirm this using R code? Don’t forget to use what you learned about the internal structure of a “phylo” object in chapter 1 to modify your tree.</li>
 </ol>
@@ -587,6 +589,91 @@ character(0)</code></pre>
 </div>
 </div>
 <p>The PICs change (PICs using the modified tree are the PICs of the original tree divided by 10), but the results of the regression using PICs do not change, because the relationship between the species (i.e., the tree topology) remained the same after multiplying branch lengths by 100.</p>
+<hr>
+<ol start="4" type="1">
+<li>Repeat the simulation analysis of type I error for OLS, in the last section of the chapter, but using a “pure-birth” model of diversification (i.e., trees simulated using <code>pbtree()</code> but with the extinction rate, <em>d</em>, set to 0). How does this change to the way your phylogenies are simulated affect your results? In particular, does it cause the type I error rate that results from ignoring the phylogeny to go up or go down? Can you explain the differences that you find?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define function to simulate P-values for OLS and regression on PICs</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>simulate_pvals <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">birth =</span> <span class="dv">1</span>, <span class="at">death =</span> <span class="dv">0</span>) {</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Helper function to simulate trees and discard trees that go extinct</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    sim_tree <span class="ot">&lt;-</span> <span class="cf">function</span>() { </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>        tree <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span>(<span class="fu">is.null</span>(tree)) {</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>            tree <span class="ot">&lt;-</span> <span class="fu">pbtree</span>(</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">n =</span> <span class="dv">100</span>, <span class="at">b =</span> birth, <span class="at">d =</span> death, <span class="at">extant.only =</span> <span class="cn">TRUE</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(tree)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate 500 trees in a list using replicate</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    trees <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">500</span>, <span class="fu">sim_tree</span>(), <span class="at">simplify=</span><span class="cn">FALSE</span>)  </span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">class</span>(trees) <span class="ot">&lt;-</span> <span class="st">"multiPhylo"</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate a list of `x` and `y` vectors, one for each tree  </span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">lapply</span>(trees, fastBM)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    y <span class="ot">&lt;-</span> <span class="fu">lapply</span>(trees, fastBM)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1) Fit non-phylogenetic regression (OLS) of y ~ x</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    fit_ols <span class="ot">&lt;-</span> <span class="fu">mapply</span>(<span class="cf">function</span>(x, y) <span class="fu">lm</span>(y <span class="sc">~</span> x), x, y, <span class="at">SIMPLIFY=</span><span class="cn">FALSE</span>)</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    p_ols <span class="ot">&lt;-</span> <span class="fu">vapply</span>(</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>        fit_ols, <span class="cf">function</span>(x) <span class="fu">summary</span>(x)<span class="sc">$</span>coefficients[<span class="dv">2</span>, <span class="dv">4</span>], <span class="fu">numeric</span>(<span class="dv">1</span>)</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2) Fit regression on PICs</span></span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>    pic.x <span class="ot">&lt;-</span> <span class="fu">mapply</span>(pic, x, trees, <span class="at">SIMPLIFY =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>    pic.y <span class="ot">&lt;-</span> <span class="fu">mapply</span>(pic, y, trees, <span class="at">SIMPLIFY =</span> <span class="cn">FALSE</span>) </span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>    fit_pic <span class="ot">&lt;-</span> <span class="fu">mapply</span>(<span class="cf">function</span>(x, y) <span class="fu">lm</span>(y <span class="sc">~</span> x<span class="sc">+</span><span class="dv">0</span>), pic.x, pic.y, <span class="at">SIMPLIFY =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>    p_pic <span class="ot">&lt;-</span> <span class="fu">vapply</span>(</span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>        fit_pic, <span class="cf">function</span>(x) <span class="fu">summary</span>(x)<span class="sc">$</span>coefficients[<span class="dv">4</span>], <span class="fu">numeric</span>(<span class="dv">1</span>)</span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store p-values in a list</span></span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>    results <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">P_OLS =</span> p_ols, <span class="at">P_PIC =</span> p_pic)</span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(results)</span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Get P-values for regressions on simulated data</span></span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a><span class="do">## Book example</span></span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>pvals_book <span class="ot">&lt;-</span> <span class="fu">simulate_pvals</span>(<span class="at">birth =</span> <span class="dv">1</span>, <span class="at">death =</span> <span class="fl">0.8</span>)</span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-50"><a href="#cb32-50" aria-hidden="true" tabindex="-1"></a><span class="do">## Practice problem (d = 0)</span></span>
+<span id="cb32-51"><a href="#cb32-51" aria-hidden="true" tabindex="-1"></a>pvals_practice <span class="ot">&lt;-</span> <span class="fu">simulate_pvals</span>(<span class="at">birth =</span> <span class="dv">1</span>, <span class="at">death =</span> <span class="dv">0</span>)</span>
+<span id="cb32-52"><a href="#cb32-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-53"><a href="#cb32-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot P-vals as histograms</span></span>
+<span id="cb32-54"><a href="#cb32-54" aria-hidden="true" tabindex="-1"></a>plot_pvals <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb32-55"><a href="#cb32-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">P =</span> pvals_book<span class="sc">$</span>P_OLS, <span class="at">Method =</span> <span class="st">"OLS, d = 0.8"</span>),</span>
+<span id="cb32-56"><a href="#cb32-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">P =</span> pvals_book<span class="sc">$</span>P_PIC, <span class="at">Method =</span> <span class="st">"PIC, d = 0.8"</span>),</span>
+<span id="cb32-57"><a href="#cb32-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">P =</span> pvals_practice<span class="sc">$</span>P_OLS, <span class="at">Method =</span> <span class="st">"OLS, d = 0"</span>),</span>
+<span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">P =</span> pvals_practice<span class="sc">$</span>P_PIC, <span class="at">Method =</span> <span class="st">"PIC, d = 0"</span>)</span>
+<span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb32-60"><a href="#cb32-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> P)) <span class="sc">+</span></span>
+<span id="cb32-61"><a href="#cb32-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(</span>
+<span id="cb32-62"><a href="#cb32-62" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(width <span class="sc">*</span> density)),</span>
+<span id="cb32-63"><a href="#cb32-63" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"gray20"</span>, <span class="at">fill =</span> <span class="st">"gray80"</span>, <span class="at">bins =</span> <span class="dv">30</span></span>
+<span id="cb32-64"><a href="#cb32-64" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb32-65"><a href="#cb32-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">0.05</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb32-66"><a href="#cb32-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>Method) <span class="sc">+</span></span>
+<span id="cb32-67"><a href="#cb32-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb32-68"><a href="#cb32-68" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="st">"P-values"</span>, <span class="at">y =</span> <span class="st">"Relative frequency"</span>,</span>
+<span id="cb32-69"><a href="#cb32-69" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="st">"Distribution of P-values for OLS regression and PIC regression"</span>,</span>
+<span id="cb32-70"><a href="#cb32-70" aria-hidden="true" tabindex="-1"></a>        <span class="at">subtitle =</span> <span class="st">"Uncorrelated data were simulated on stochastic birth–death phylogenies"</span></span>
+<span id="cb32-71"><a href="#cb32-71" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb32-72"><a href="#cb32-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb32-73"><a href="#cb32-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span>
+<span id="cb32-74"><a href="#cb32-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-75"><a href="#cb32-75" aria-hidden="true" tabindex="-1"></a>plot_pvals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="chapter_02_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>When we replace <code>d = 0.8</code> with <code>d = 0</code>, the type I error rates go down. A possible explanation is that setting <code>d = 0</code> leads to no extinction in the simulation, leading to a larger number of extant lineages at a given time as compared to <code>d = 0.8</code>. Thus, such larger number of extant lineages increases statistical power, hence leading to lower type I error rates.</p>
 </section>
 <section id="references" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
