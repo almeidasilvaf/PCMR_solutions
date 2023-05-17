@@ -88,6 +88,7 @@ p_pics
 
 Results and conclusions did not change.
 
+---
 
 2. On the book website, we supply some data for a group of Asian barbets (`BarbetTree.nex` and `Barbetdata_mod.csv`): members of the bird family 
 Megalaimidae [@gonzalez2013evolution]. Using these data and the method of
@@ -145,7 +146,7 @@ fit_pics <- function(tree, data, x, y) {
         geom_point(size = 3, color = "deepskyblue4") +
         geom_vline(xintercept = 0, linetype = 3) +
         geom_hline(yintercept = 0, linetype = 3) +
-        geom_smooth(method = "lm", se = FALSE, formula = "y ~ x") +
+        geom_smooth(method = "lm", se = FALSE, formula = "y ~ x+0") +
         labs(
             title = paste0("Regression of ", y, " on ", x),
             subtitle = subtitle,
@@ -176,6 +177,7 @@ the variables. The P-value and variance explained remain the same,
 but the slope ($B_1$) changes, which is expected considering that predictors
 and outcomes have been flipped.
 
+---
 
 3. If you multiply all the branches of your phylogenetic tree by 100, 
 will your independent contrasts analysis change? Why or why not? 
@@ -213,6 +215,101 @@ The PICs change (PICs using the modified tree are the PICs of the original
 tree divided by 10), but the results of the regression using PICs do not 
 change, because the relationship between the species (i.e., the tree topology)
 remained the same after multiplying branch lengths by 100.
+
+---
+
+4. Repeat the simulation analysis of type I error for OLS, 
+in the last section of the chapter, but using a “pure-birth” model 
+of diversification (i.e., trees simulated using `pbtree()` 
+but with the extinction rate, *d*, set to 0). How does this change to the
+way your phylogenies are simulated affect your results? 
+In particular, does it cause the type I error rate that results
+from ignoring the phylogeny to go up or go down? Can you explain 
+the differences that you find?
+
+```{r}
+# Define function to simulate P-values for OLS and regression on PICs
+simulate_pvals <- function(birth = 1, death = 0) {
+    
+    # Helper function to simulate trees and discard trees that go extinct
+    sim_tree <- function() { 
+        tree <- NULL 
+        while(is.null(tree)) {
+            tree <- pbtree(
+                n = 100, b = birth, d = death, extant.only = TRUE, quiet = TRUE
+            )
+        }
+        return(tree)
+    }
+    
+
+    # Simulate 500 trees in a list using replicate
+    trees <- replicate(500, sim_tree(), simplify=FALSE)  
+    class(trees) <- "multiPhylo"
+    
+    # Simulate a list of `x` and `y` vectors, one for each tree  
+    x <- lapply(trees, fastBM)
+    y <- lapply(trees, fastBM)
+    
+    # 1) Fit non-phylogenetic regression (OLS) of y ~ x
+    fit_ols <- mapply(function(x, y) lm(y ~ x), x, y, SIMPLIFY=FALSE)
+    
+    p_ols <- vapply(
+        fit_ols, function(x) summary(x)$coefficients[2, 4], numeric(1)
+    )
+    
+    # 2) Fit regression on PICs
+    pic.x <- mapply(pic, x, trees, SIMPLIFY = FALSE)
+    pic.y <- mapply(pic, y, trees, SIMPLIFY = FALSE) 
+    fit_pic <- mapply(function(x, y) lm(y ~ x+0), pic.x, pic.y, SIMPLIFY = FALSE)
+    
+    p_pic <- vapply(
+        fit_pic, function(x) summary(x)$coefficients[4], numeric(1)
+    )
+    
+    # Store p-values in a list
+    results <- list(P_OLS = p_ols, P_PIC = p_pic)
+    return(results)
+}
+
+
+# Get P-values for regressions on simulated data
+## Book example
+pvals_book <- simulate_pvals(birth = 1, death = 0.8)
+
+## Practice problem (d = 0)
+pvals_practice <- simulate_pvals(birth = 1, death = 0)
+
+# Plot P-vals as histograms
+plot_pvals <- rbind(
+    data.frame(P = pvals_book$P_OLS, Method = "OLS, d = 0.8"),
+    data.frame(P = pvals_book$P_PIC, Method = "PIC, d = 0.8"),
+    data.frame(P = pvals_practice$P_OLS, Method = "OLS, d = 0"),
+    data.frame(P = pvals_practice$P_PIC, Method = "PIC, d = 0")
+) |>
+    ggplot(aes(x = P)) +
+    geom_histogram(
+        aes(y = after_stat(width * density)),
+        color = "gray20", fill = "gray80", bins = 30
+    ) +
+    geom_hline(yintercept = 0.05, linetype = 3) +
+    facet_wrap(~Method) +
+    labs(
+        x = "P-values", y = "Relative frequency",
+        title = "Distribution of P-values for OLS regression and PIC regression",
+        subtitle = "Uncorrelated data were simulated on stochastic birth–death phylogenies"
+    ) +
+    ylim(0, 0.5) +
+    theme_bw()
+
+plot_pvals
+```
+
+When we replace `d = 0.8` with `d = 0`, the type I error rates go down. 
+A possible explanation is that setting `d = 0` leads to no extinction in
+the simulation, leading to a larger number of extant lineages at a given
+time as compared to `d = 0.8`. Thus, such larger number of extant lineages
+increases statistical power, hence leading to lower type I error rates.
 
 
 ## References {.unnumbered}
