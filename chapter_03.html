@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -61,6 +95,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -192,7 +228,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#references" id="toc-references" class="nav-link active" data-scroll-target="#references">References</a></li>
+  <li><a href="#practice-problems" id="toc-practice-problems" class="nav-link active" data-scroll-target="#practice-problems"><span class="header-section-number">3.1</span> Practice problems</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -216,6 +253,240 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>Loading required packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phytools)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ape)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nlme)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="practice-problems" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="practice-problems"><span class="header-section-number">3.1</span> Practice problems</h2>
+<ol type="1">
+<li>In practice problem 2 of the previous chapter, you used Asian barbet data to test whether the variable <em>Lnalt</em> varied as a function of <em>wing</em>. Again, using these data from Asian barbets (<code>BarbetTree.nex</code> and <code>Barbetdata_mod.csv</code>), carry out the same analysis using PGLS. Confirm that you get the same results from PGLS and PICs. What happens to your fitted model if you also estimate <span class="math inline">\(\lambda\)</span> using the <code>corPagel()</code> function?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>barbet <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"http://www.phytools.org/Rbook/2/Barbetdata.csv"</span>, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.names =</span> <span class="dv">1</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>barbet_tree <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="st">"http://www.phytools.org/Rbook/2/BarbetTree.nex"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix inconsistencies</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> geiger<span class="sc">::</span><span class="fu">name.check</span>(barbet_tree, barbet)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>barbet_tree <span class="ot">&lt;-</span> <span class="fu">drop.tip</span>(barbet_tree, check<span class="sc">$</span>tree_not_data)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to fit PGLS</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>fit_pgls <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        tree, data, </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">model_formula =</span> <span class="cn">NULL</span>, </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">corStruct =</span> <span class="cn">NULL</span>, </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">gls_method =</span> <span class="st">"ML"</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    ) {</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit PGLS</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    model <span class="ot">&lt;-</span> nlme<span class="sc">::</span><span class="fu">gls</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.formula</span>(model_formula), <span class="at">data =</span> data, </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">correlation =</span> corStruct, </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">method =</span> gls_method</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    output <span class="ot">&lt;-</span> <span class="fu">summary</span>(model)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(output)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit regression on PICs with PGLS</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"utils.R"</span>))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>pic_model <span class="ot">&lt;-</span> <span class="fu">fit_pics</span>(</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree =</span> barbet_tree, </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> barbet, </span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"wing"</span>, <span class="at">y =</span> <span class="st">"Lnalt"</span>, </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">return =</span> <span class="st">"model"</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>spp <span class="ot">&lt;-</span> <span class="fu">rownames</span>(barbet)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>pgls_model <span class="ot">&lt;-</span> <span class="fu">fit_pgls</span>(</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree =</span> barbet_tree, </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">log</span>(barbet), </span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_formula =</span> <span class="st">"Lnalt ~ wing"</span>, </span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">corStruct =</span> <span class="fu">corBrownian</span>(<span class="at">phy =</span> barbet_tree, <span class="at">form =</span> <span class="sc">~</span>spp)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare models</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>model_comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"PIC"</span>, <span class="st">"PGLS"</span>),</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">Slopes =</span> <span class="fu">c</span>(pic_model<span class="sc">$</span>coefficients[<span class="dv">1</span>], pgls_model<span class="sc">$</span>coefficients[<span class="dv">2</span>]),</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">P_values =</span> <span class="fu">c</span>(pic_model<span class="sc">$</span>coefficients[<span class="dv">4</span>], pgls_model<span class="sc">$</span>tTable[<span class="dv">2</span>, <span class="dv">4</span>]),</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">row.names =</span> <span class="cn">NULL</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>model_comparison</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Model   Slopes  P_values
+1   PIC -1.10126 0.1057527
+2  PGLS -1.10126 0.1057527</code></pre>
+</div>
+</div>
+<p>As we can see, the slopes (<span class="math inline">\(\beta_1\)</span>) and P-values are numerically identical, which confirms that regression on PICs and PGLS are equivalent.</p>
+<p>Now, let’s fit a PGLS model using the correlation structure inferred with <code>corPagel()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit PGLS using a correlation structure inferred with `corPagel()`</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>spp <span class="ot">&lt;-</span> <span class="fu">rownames</span>(barbet)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pgls_pagel <span class="ot">&lt;-</span> <span class="fu">fit_pgls</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree =</span> barbet_tree, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">log</span>(barbet), </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_formula =</span> <span class="st">"Lnalt ~ wing"</span>, </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">corStruct =</span> <span class="fu">corPagel</span>(<span class="dv">1</span>, <span class="at">phy =</span> barbet_tree, <span class="at">form =</span> <span class="sc">~</span>spp)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>pgls_pagel</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized least squares fit by maximum likelihood
+  Model: as.formula(model_formula) 
+  Data: data 
+        AIC       BIC  logLik
+  -61.57079 -55.58476 34.7854
+
+Correlation Structure: corPagel
+ Formula: ~spp 
+ Parameter estimate(s):
+ lambda 
+1.01886 
+
+Coefficients:
+                Value Std.Error   t-value p-value
+(Intercept)  3.344991 0.9561129  3.498532  0.0014
+wing        -1.032918 0.6342422 -1.628587  0.1135
+
+ Correlation: 
+     (Intr)
+wing -0.995
+
+Standardized residuals:
+       Min         Q1        Med         Q3        Max 
+-1.2406306  0.2373491  0.8082668  1.2383931  1.9009173 
+
+Residual standard error: 0.1694595 
+Degrees of freedom: 33 total; 31 residual</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare all models</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    model_comparison,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">Model =</span> <span class="st">"PGLS_Pagel"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">Slopes =</span> pgls_pagel<span class="sc">$</span>coefficients[<span class="dv">2</span>],</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">P_values =</span> pgls_model<span class="sc">$</span>tTable[<span class="dv">2</span>, <span class="dv">4</span>],</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">row.names =</span> <span class="cn">NULL</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Model    Slopes  P_values
+1        PIC -1.101260 0.1057527
+2       PGLS -1.101260 0.1057527
+3 PGLS_Pagel -1.032918 0.1057527</code></pre>
+</div>
+</div>
+<p><code>corPagel()</code> estimates a <span class="math inline">\(\lambda\)</span> that is slightly larger than 1, which leads to a model with a slightly smaller slope, but P-values remain the same.</p>
+<hr>
+<ol start="2" type="1">
+<li>If you multiply all the branches of your phylogenetic tree by 100, will your PGLS analysis change? Why or why not? Can you confirm this using R code?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new tree with branch lengths multiplied by 100</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>new_tree <span class="ot">&lt;-</span> barbet_tree</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>new_tree<span class="sc">$</span>edge.length <span class="ot">&lt;-</span> new_tree<span class="sc">$</span>edge.length <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit PGLS</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>pgls_longbranches <span class="ot">&lt;-</span> <span class="fu">fit_pgls</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree =</span> new_tree, </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">log</span>(barbet), </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_formula =</span> <span class="st">"Lnalt ~ wing"</span>, </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">corStruct =</span> <span class="fu">corBrownian</span>(<span class="at">phy =</span> barbet_tree, <span class="at">form =</span> <span class="sc">~</span>spp)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>pgls_longbranches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized least squares fit by maximum likelihood
+  Model: as.formula(model_formula) 
+  Data: data 
+        AIC       BIC   logLik
+  -61.88248 -57.39296 33.94124
+
+Correlation Structure: corBrownian
+ Formula: ~spp 
+ Parameter estimate(s):
+numeric(0)
+
+Coefficients:
+                Value Std.Error   t-value p-value
+(Intercept)  3.448232 0.9954190  3.464101  0.0016
+wing        -1.101260 0.6609501 -1.666178  0.1058
+
+ Correlation: 
+     (Intr)
+wing -0.996
+
+Standardized residuals:
+       Min         Q1        Med         Q3        Max 
+-1.3048158  0.2657199  0.8646903  1.3240892  2.0679276 
+
+Residual standard error: 0.1587308 
+Degrees of freedom: 33 total; 31 residual</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Are model coefficients and p-values the same?</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(pgls_model<span class="sc">$</span>tTable, pgls_longbranches<span class="sc">$</span>tTable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>After multiplying branch lengths by 100, model coefficients and P-values remain the same. Since the species relationships (i.e., tree topology) were not affected and all branches were multiplied by 100, the variance-covariance matrix (i.e., correlation structure) remained the same, which explains why nothing changed.</p>
+<hr>
+<ol start="3" type="1">
+<li>Use the data files from chapter 1 to run a phylogenetic ANCOVA for anoles testing for the effect of body size (“SVL”) and ecomorphological state (“ecomorph”) on forelimb length (“FLL”) in anoles, using an Ornstein–Uhlenbeck model, as implemented in the ape function <code>corMartins()</code>, as your correlational structure for the residual error of the model. You can use the data files from chapter 1, but you will need to do some work to combine data across files.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get phenotypic data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>anolis <span class="ot">&lt;-</span> <span class="fu">merge</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read.csv</span>(<span class="st">"http://www.phytools.org/Rbook/3/ecomorph.csv"</span>, <span class="at">row.names =</span> <span class="dv">1</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read.csv</span>(<span class="st">"http://www.phytools.org/Rbook/3/anole.data.csv"</span>, <span class="at">row.names =</span> <span class="dv">1</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"row.names"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    tibble<span class="sc">::</span><span class="fu">column_to_rownames</span>(<span class="st">"Row.names"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get tree</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>anolis_tree <span class="ot">&lt;-</span> <span class="fu">read.tree</span>(<span class="st">"http://www.phytools.org/Rbook/3/Anolis.tre"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check data for inconsistencies</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> geiger<span class="sc">::</span><span class="fu">name.check</span>(anolis_tree, anolis)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>anolis_tree <span class="ot">&lt;-</span> <span class="fu">drop.tip</span>(anolis_tree, check<span class="sc">$</span>tree_not_data)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit PGLS - phylogenetic ANCOVA</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>spp <span class="ot">&lt;-</span> <span class="fu">rownames</span>(anolis)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>anolis_ancova <span class="ot">&lt;-</span> <span class="fu">fit_pgls</span>(</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree =</span> anolis_tree,</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> anolis,</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_formula =</span> <span class="st">"FLL ~ SVL + ecomorph"</span>,</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">corStruct =</span> <span class="fu">corMartins</span>(<span class="dv">1</span>, <span class="at">phy =</span> anolis_tree, <span class="at">form =</span> <span class="sc">~</span>spp)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(anolis_ancova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Denom. DF: 75 
+            numDF  F-value p-value
+(Intercept)     1 4701.826  &lt;.0001
+SVL             1 2122.341  &lt;.0001
+ecomorph        5   21.264  &lt;.0001</code></pre>
+</div>
+</div>
+<p>The phylogenetic ANCOVA shows that there is a significant effect of body size on forelimb length after controlling for the also significant effect of ecomorphological state.</p>
+</section>
 <section id="references" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
 
