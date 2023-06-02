@@ -1,5 +1,188 @@
 
 # Modeling continuous character evolution on a phylogeny
 
+Loading required packages:
 
-## References {.unnumbered}
+```{r load-pkgs}
+#| message: false
+#| warning: false
+
+set.seed(123) # for reproducibility
+
+library(phytools)
+library(ape)
+library(geiger)
+library(dplyr)
+```
+
+
+## Practice problems
+
+1. The data set used in this chapter also includes estimates 
+of GC content (*"GC_Content_Percent"*). Fit the three models (BM, OU, and EB) 
+for this character. Also test for phylogenetic signal in GC content. 
+What do you conclude?
+
+```{r}
+# Get data
+bacteria <- read.csv(
+    "http://www.phytools.org/Rbook/4/bac_rates.csv", row.names = 1
+)
+
+# Get tree
+bacteria_tree <- read.tree("http://www.phytools.org/Rbook/4/bac_rates.phy")
+
+# Check tree and data for inconsistencies
+check <- geiger::name.check(bacteria_tree, bacteria)
+check
+
+# Fit models
+gc_content <- setNames(log(bacteria$GC_Content_Percent), rownames(bacteria))
+
+## Brownian motion
+model_bm <- fitContinuous(bacteria_tree, gc_content)
+
+## Ornstein-Uhlenbeck
+model_ou <- fitContinuous(
+    bacteria_tree, gc_content, model = "OU", bounds = list(alpha = c(0, 10))
+)
+
+## Early-burst
+model_eb <- fitContinuous(bacteria_tree, gc_content, model = "EB")
+
+# Comparing the models
+model_comp <- data.frame(
+    Models = c("BM", "OU", "EB"),
+    AIC = c(AIC(model_bm), AIC(model_ou), AIC(model_eb))
+)
+model_comp$AIC.w <- aic.w(model_comp$AIC)
+
+model_comp
+```
+
+The Akaike Information Criteria (AIC) and AIC weights shows that the OU model
+has more support.
+
+Now, let's test for phylogenetic signal in GC content.
+
+```{r}
+# Test for phylogenetic signal
+## Blomberg's K
+signal_k <- phylosig(
+    bacteria_tree, gc_content, method = "K", test = TRUE, nsim = 10000
+)
+
+## Pagel's lambda
+signal_lambda <- phylosig(
+    bacteria_tree, gc_content, method = "lambda", test = TRUE, nsim = 1000
+)
+
+# Summarizing model results
+signal_summary <- data.frame(
+    Method = c("Blomberg's K", "Pagel's lambda"),
+    Stat = c(signal_k$K, signal_lambda$lambda),
+    P_value = c(signal_k$P, signal_lambda$P)
+)
+signal_summary
+```
+
+Both statistics (Pagel's $\lambda$ and Blomberg's K) indicate that there is
+stronger phylogenetic signal that what is expected by chance, which
+means that the evolution of GC content is influenced by the shared
+evolutionary history among species in the tree.
+
+
+---
+
+2. Reanalyze the data for mutation accumulation rate, but this time do not
+log-transform the data. What happens? Can you explain the discrepancy?
+
+```{r}
+# Get mutation accumulation rate
+mutation <- setNames(bacteria$Accumulation_Rate, rownames(bacteria))
+
+# Fit model with log-transformed and non-log-transformed data
+mutation_original <- fitContinuous(bacteria_tree, mutation)
+mutation_log <- fitContinuous(bacteria_tree, log(mutation))
+
+# Compare models
+model_comp <- data.frame(
+    Models = c("Log-transformed", "Original"),
+    AIC = c(AIC(mutation_log), AIC(mutation_original))
+)
+model_comp$AIC.w <- aic.w(model_comp$AIC)
+
+model_comp
+```
+
+When fitting a Brownian motion model on highly left-skewed data,
+the parameter estimates change dramatically ($\sigma^2 = 0.00000$ and
+$z_0 - 0.000004$). The reason for this discrepancy can be attributed to 
+the highly left-skewed nature of the original data. Brownian motion assumes 
+that the variable evolves continuously over time with a constant variance.
+However, if the data is highly left-skewed, it indicates a lack of variation 
+or change over time. This results in the model fitting a variance close to 
+zero, indicating no significant evolutionary pattern.
+
+---
+
+3. You might wonder about the relationship between the models considered here 
+and phylogenetic signal. Use a simulation study to find out! Focus for now 
+on the OU model, which can be simulated using `fastBM()` in *phytools*. 
+For simplicity, you can use the bacterial tree, `bacteria.tree`, 
+that we used in this exercise. On that tree, simulate OU characters 
+with $\sigma^2 = 1$, expected mean $\theta = 0$, and root state $\alpha = 0$. 
+Vary $\alpha$ over a range of values from small $\alpha = 0.1$ to 
+large $\alpha = 10$. For each simulation, determine the amount of 
+phylogenetic signal, and do a significance test. See if you can detect the 
+general pattern!
+
+```{r}
+# Get tree
+bacteria_tree <- read.tree("http://www.phytools.org/Rbook/4/bac_rates.phy")
+
+# Define simulation parameters
+sigma2 <- 1
+theta <- 0
+alpha <- c(0.1, 0.5, 1, 2, 5, 10)
+nsim <- 50
+
+#' Simulate 50 OU characters with increasingly large alpha values and test
+#' for phylogenetic signal in each simulation
+sim <- Reduce(rbind, lapply(alpha, function(x) {
+    
+    # Simulate OU characters
+    characters <- fastBM(
+        bacteria_tree, alpha = x, theta = theta, sig2 = sigma2, nsim = nsim
+    )
+    
+    # Test for phylogenetic signal in each character and get P-values
+    sig <- Reduce(rbind, apply(characters, 2, function(y) {
+        s <- phylosig(bacteria_tree, y, test = TRUE, nsim = 10000)
+        results <- data.frame(
+            K = s$K, 
+            P = s$P,
+            alpha = x
+        )
+        return(results)
+    }))
+    
+    return(sig)
+}))
+
+# Calculate mean K and percentage of significant K values for each alpha
+sim |>
+    group_by(alpha) |>
+    summarise(
+        MeanK = mean(K),
+        `% significant` = sum(P < 0.05)
+    )
+```
+
+The simulations show that the larger the value of $\alpha$, the smaller
+the K and the percentage of significant K values. Since larger values of
+$\alpha$ indicate stronger selection pressures towards the optimum value,
+the weaker phylogenetic signal is very reasonable, as stronger selection
+leads to a more constrained evolution, reducing the influence of shared
+evolutionary history on the trait values.
+
