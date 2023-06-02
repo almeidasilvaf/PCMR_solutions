@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.361">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -57,10 +91,13 @@ ul.task-list li input[type="checkbox"] {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -76,7 +113,7 @@ ul.task-list li input[type="checkbox"] {
       <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/chapter_04.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Modeling continuous character evolution on a phylogeny</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -192,7 +229,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#references" id="toc-references" class="nav-link active" data-scroll-target="#references">References</a></li>
+  <li><a href="#practice-problems" id="toc-practice-problems" class="nav-link active" data-scroll-target="#practice-problems"><span class="header-section-number">4.1</span> Practice problems</a></li>
   </ul>
 </nav>
     </div>
@@ -216,8 +253,176 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="references" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<p>Loading required packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phytools)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ape)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geiger)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="practice-problems" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="practice-problems"><span class="header-section-number">4.1</span> Practice problems</h2>
+<ol type="1">
+<li>The data set used in this chapter also includes estimates of GC content (<em>“GC_Content_Percent”</em>). Fit the three models (BM, OU, and EB) for this character. Also test for phylogenetic signal in GC content. What do you conclude?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>bacteria <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"http://www.phytools.org/Rbook/4/bac_rates.csv"</span>, <span class="at">row.names =</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get tree</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>bacteria_tree <span class="ot">&lt;-</span> <span class="fu">read.tree</span>(<span class="st">"http://www.phytools.org/Rbook/4/bac_rates.phy"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Check tree and data for inconsistencies</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> geiger<span class="sc">::</span><span class="fu">name.check</span>(bacteria_tree, bacteria)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>check</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "OK"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit models</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>gc_content <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">log</span>(bacteria<span class="sc">$</span>GC_Content_Percent), <span class="fu">rownames</span>(bacteria))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Brownian motion</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>model_bm <span class="ot">&lt;-</span> <span class="fu">fitContinuous</span>(bacteria_tree, gc_content)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Ornstein-Uhlenbeck</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>model_ou <span class="ot">&lt;-</span> <span class="fu">fitContinuous</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    bacteria_tree, gc_content, <span class="at">model =</span> <span class="st">"OU"</span>, <span class="at">bounds =</span> <span class="fu">list</span>(<span class="at">alpha =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Early-burst</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>model_eb <span class="ot">&lt;-</span> <span class="fu">fitContinuous</span>(bacteria_tree, gc_content, <span class="at">model =</span> <span class="st">"EB"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparing the models</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>model_comp <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Models =</span> <span class="fu">c</span>(<span class="st">"BM"</span>, <span class="st">"OU"</span>, <span class="st">"EB"</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">AIC =</span> <span class="fu">c</span>(<span class="fu">AIC</span>(model_bm), <span class="fu">AIC</span>(model_ou), <span class="fu">AIC</span>(model_eb))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>model_comp<span class="sc">$</span>AIC.w <span class="ot">&lt;-</span> <span class="fu">aic.w</span>(model_comp<span class="sc">$</span>AIC)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>model_comp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Models       AIC     AIC.w
+1     BM -5.559379 0.2834248
+2     OU -7.099960 0.6123091
+3     EB -3.559378 0.1042661</code></pre>
+</div>
+</div>
+<p>The Akaike Information Criteria (AIC) and AIC weights shows that the OU model has more support.</p>
+<p>Now, let’s test for phylogenetic signal in GC content.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test for phylogenetic signal</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Blomberg's K</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>signal_k <span class="ot">&lt;-</span> <span class="fu">phylosig</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    bacteria_tree, gc_content, <span class="at">method =</span> <span class="st">"K"</span>, <span class="at">test =</span> <span class="cn">TRUE</span>, <span class="at">nsim =</span> <span class="dv">10000</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Pagel's lambda</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>signal_lambda <span class="ot">&lt;-</span> <span class="fu">phylosig</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    bacteria_tree, gc_content, <span class="at">method =</span> <span class="st">"lambda"</span>, <span class="at">test =</span> <span class="cn">TRUE</span>, <span class="at">nsim =</span> <span class="dv">1000</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarizing model results</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>signal_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">Method =</span> <span class="fu">c</span>(<span class="st">"Blomberg's K"</span>, <span class="st">"Pagel's lambda"</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">Stat =</span> <span class="fu">c</span>(signal_k<span class="sc">$</span>K, signal_lambda<span class="sc">$</span>lambda),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">P_value =</span> <span class="fu">c</span>(signal_k<span class="sc">$</span>P, signal_lambda<span class="sc">$</span>P)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>signal_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          Method      Stat      P_value
+1   Blomberg's K 0.2188203 7.000000e-04
+2 Pagel's lambda 1.0043429 2.449554e-06</code></pre>
+</div>
+</div>
+<p>Both statistics (Pagel’s <span class="math inline">\(\lambda\)</span> and Blomberg’s K) indicate that there is stronger phylogenetic signal that what is expected by chance, which means that the evolution of GC content is influenced by the shared evolutionary history among species in the tree.</p>
+<hr>
+<ol start="2" type="1">
+<li>Reanalyze the data for mutation accumulation rate, but this time do not log-transform the data. What happens? Can you explain the discrepancy?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get mutation accumulation rate</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>mutation <span class="ot">&lt;-</span> <span class="fu">setNames</span>(bacteria<span class="sc">$</span>Accumulation_Rate, <span class="fu">rownames</span>(bacteria))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit model with log-transformed and non-log-transformed data</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>mutation_original <span class="ot">&lt;-</span> <span class="fu">fitContinuous</span>(bacteria_tree, mutation)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>mutation_log <span class="ot">&lt;-</span> <span class="fu">fitContinuous</span>(bacteria_tree, <span class="fu">log</span>(mutation))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare models</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>model_comp <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Models =</span> <span class="fu">c</span>(<span class="st">"Log-transformed"</span>, <span class="st">"Original"</span>),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">AIC =</span> <span class="fu">c</span>(<span class="fu">AIC</span>(mutation_log), <span class="fu">AIC</span>(mutation_original))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>model_comp<span class="sc">$</span>AIC.w <span class="ot">&lt;-</span> <span class="fu">aic.w</span>(model_comp<span class="sc">$</span>AIC)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>model_comp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Models       AIC         AIC.w
+1 Log-transformed  155.5445 2.366319e-196
+2        Original -745.3462  1.000000e+00</code></pre>
+</div>
+</div>
+<p>When fitting a Brownian motion model on highly left-skewed data, the parameter estimates change dramatically (<span class="math inline">\(\sigma^2 = 0.00000\)</span> and <span class="math inline">\(z_0 - 0.000004\)</span>). The reason for this discrepancy can be attributed to the highly left-skewed nature of the original data. Brownian motion assumes that the variable evolves continuously over time with a constant variance. However, if the data is highly left-skewed, it indicates a lack of variation or change over time. This results in the model fitting a variance close to zero, indicating no significant evolutionary pattern.</p>
+<hr>
+<ol start="3" type="1">
+<li>You might wonder about the relationship between the models considered here and phylogenetic signal. Use a simulation study to find out! Focus for now on the OU model, which can be simulated using <code>fastBM()</code> in <em>phytools</em>. For simplicity, you can use the bacterial tree, <code>bacteria.tree</code>, that we used in this exercise. On that tree, simulate OU characters with <span class="math inline">\(\sigma^2 = 1\)</span>, expected mean <span class="math inline">\(\theta = 0\)</span>, and root state <span class="math inline">\(\alpha = 0\)</span>. Vary <span class="math inline">\(\alpha\)</span> over a range of values from small <span class="math inline">\(\alpha = 0.1\)</span> to large <span class="math inline">\(\alpha = 10\)</span>. For each simulation, determine the amount of phylogenetic signal, and do a significance test. See if you can detect the general pattern!</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get tree</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bacteria_tree <span class="ot">&lt;-</span> <span class="fu">read.tree</span>(<span class="st">"http://www.phytools.org/Rbook/4/bac_rates.phy"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define simulation parameters</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>nsim <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#' Simulate 50 OU characters with increasingly large alpha values and test</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#' for phylogenetic signal in each simulation</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(rbind, <span class="fu">lapply</span>(alpha, <span class="cf">function</span>(x) {</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate OU characters</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    characters <span class="ot">&lt;-</span> <span class="fu">fastBM</span>(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        bacteria_tree, <span class="at">alpha =</span> x, <span class="at">theta =</span> theta, <span class="at">sig2 =</span> sigma2, <span class="at">nsim =</span> nsim</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Test for phylogenetic signal in each character and get P-values</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    sig <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(rbind, <span class="fu">apply</span>(characters, <span class="dv">2</span>, <span class="cf">function</span>(y) {</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        s <span class="ot">&lt;-</span> <span class="fu">phylosig</span>(bacteria_tree, y, <span class="at">test =</span> <span class="cn">TRUE</span>, <span class="at">nsim =</span> <span class="dv">10000</span>)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">K =</span> s<span class="sc">$</span>K, </span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">P =</span> s<span class="sc">$</span>P,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> x</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(results)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    }))</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(sig)</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate mean K and percentage of significant K values for each alpha</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>sim <span class="sc">|&gt;</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(alpha) <span class="sc">|&gt;</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">MeanK =</span> <span class="fu">mean</span>(K),</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">% significant</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(P <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  alpha MeanK `% significant`
+  &lt;dbl&gt; &lt;dbl&gt;           &lt;int&gt;
+1   0.1 0.849              50
+2   0.5 0.750              49
+3   1   0.567              50
+4   2   0.440              50
+5   5   0.260              44
+6  10   0.185              38</code></pre>
+</div>
+</div>
+<p>The simulations show that the larger the value of <span class="math inline">\(\alpha\)</span>, the smaller the K and the percentage of significant K values. Since larger values of <span class="math inline">\(\alpha\)</span> indicate stronger selection pressures towards the optimum value, the weaker phylogenetic signal is very reasonable, as stronger selection leads to a more constrained evolution, reducing the influence of shared evolutionary history on the trait values.</p>
 
 
 </section>
